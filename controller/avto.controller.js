@@ -1,9 +1,10 @@
 const CustomErrorHandler = require("../error/custom-error.handler");
 const AvtoSchema = require("../schema/avto.schema");
+const brandSchema = require("../schema/brand.schema");
 
 const getALLCars = async (req, res) => {
   try {
-    const cars = await AvtoSchema.find().populate("clientInfo");
+    const cars = await AvtoSchema.find().populate("marka");
 
     res.status(200).json(cars);
   } catch (error) {
@@ -26,8 +27,9 @@ const getOneCar = async (req, res) => {
 
 const addCar = async (req, res) => {
   try {
+    const adminInfo = req.user.id;
     const {
-      Marka,
+      marka,
       motor,
       year,
       color,
@@ -42,8 +44,14 @@ const addCar = async (req, res) => {
       avtoInfo,
     } = req.body;
 
+    const foundedMarka = await brandSchema.findOne({ name: marka });
+
+    if (!foundedMarka) {
+      throw CustomErrorHandler.BadRequest("marka is incorrect");
+    }
+
     await AvtoSchema.create({
-      Marka,
+      marka: foundedMarka._id,
       motor,
       year,
       color,
@@ -56,6 +64,7 @@ const addCar = async (req, res) => {
       ichkimakonimageUrl,
       modelturimageUrl,
       avtoInfo,
+      adminInfo,
     });
 
     res.status(201).json({

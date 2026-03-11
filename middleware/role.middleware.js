@@ -1,18 +1,23 @@
-const CustomErrorHandler = require("../error/custom-error.handler");
-
 const roleMiddleware = (roles = []) => {
   return (req, res, next) => {
-    const user = req.user;
+    try {
+      const user = req.user;
 
-    if (!user) {
-      return next(CustomErrorHandler.Unauthorized());
+      if (!user) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      if (!roles.includes(user.role)) {
+        return res.status(403).json({
+          message: "Access denied",
+          errors: [],
+        });
+      }
+
+      next();
+    } catch (error) {
+      res.status(500).json({ message: error.message });
     }
-
-    if (!roles.includes(user.role)) {
-      return next(CustomErrorHandler.Forbidden("Access denied"));
-    }
-
-    next();
   };
 };
 

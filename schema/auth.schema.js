@@ -22,13 +22,21 @@ const Auth = new Schema({
     enum: ["admin", "user"],
     default: "user",
   },
+
+  savedCars: [
+    {
+      type: Schema.Types.ObjectId,
+      ref: "avto",
+    },
+  ],
+
   otp: {
     type: String,
-    required: true,
+    default: null,
   },
   otpTime: {
     type: Number,
-    required: true,
+    default: null,
   },
 });
 

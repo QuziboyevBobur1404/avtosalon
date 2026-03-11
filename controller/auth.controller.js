@@ -3,7 +3,6 @@ const AuthSchema = require("../schema/auth.schema");
 
 const bcrypt = require("bcryptjs");
 const sendMessage = require("../utils/send-email");
-const { date } = require("joi");
 const { access_token, refresh_token } = require("../utils/jwt");
 
 const register = async (req, res, next) => {
@@ -31,6 +30,39 @@ const register = async (req, res, next) => {
     });
 
     res.status(200).json({ message: "registered" });
+  } catch (error) {
+    next(error);
+  }
+};
+
+const login = async (req, res, next) => {
+  try {
+    const { email, password } = req.body;
+
+    const foundedUser = await AuthSchema.findOne({ email });
+
+    if (!foundedUser) {
+      throw CustomErrorHandler.NotFound("User not found");
+    }
+
+    const check = await bcrypt.compare(password, foundedUser.password);
+
+    if (!check) {
+      throw CustomErrorHandler.BadRequest("password is incorrect");
+    }
+
+    const code = Array.from({ length: 6 }, () =>
+      Math.round(Math.random() * 6),
+    ).join("");
+
+    await sendMessage(code, email);
+
+    await AuthSchema.findByIdAndUpdate(foundedUser._id, {
+      otp: code,
+      otpTime: Date.now() + 120000,
+    });
+
+    res.status(200).json({ message: "check your email" });
   } catch (error) {
     next(error);
   }
@@ -96,4 +128,5 @@ const verify = async (req, res, next) => {
 module.exports = {
   register,
   verify,
+  login
 };

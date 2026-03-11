@@ -55,10 +55,10 @@ const Avto = new Schema(
       type: String,
       required: [true, "Model korinishi bo'lishi kerak"],
     },
-    clientInfo: {
+    adminInfo: {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "avto",
+      ref: "auth",
     },
   },
   {

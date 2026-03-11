@@ -1,9 +1,9 @@
 const { Router } = require("express");
-const { register } = require("../controller/auth.controller");
-const { verify } = require("jsonwebtoken");
+const { register, verify, login } = require("../controller/auth.controller");
 
 const authRouter = Router();
 
 authRouter.post("/register", register);
+authRouter.post("/login", login);
 authRouter.post("/verify", verify);
 module.exports = authRouter;

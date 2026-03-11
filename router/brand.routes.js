@@ -10,7 +10,7 @@ const brandRouter = Router();
 brandRouter.get("/brands", getAllBrands);
 
 brandRouter.post(
-  "/brands",
+  "/add_brand",
   authMiddleware,
   roleMiddleware(["admin"]),
   addBrand,
